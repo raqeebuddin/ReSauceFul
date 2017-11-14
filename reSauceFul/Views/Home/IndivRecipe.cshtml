@@ -1,0 +1,61 @@
+﻿@*@model reSauceFul.Models.SingleRecipe*@
+@model IEnumerable<object>
+
+@{
+    List<reSauceFul.Models.Review> reviews = Model.ToList()[0] as List<reSauceFul.Models.Review>;
+
+    reSauceFul.Models.SingleRecipe recipe = Model.ToList()[1] as reSauceFul.Models.SingleRecipe;
+        }
+    @{
+        ViewBag.Title = "IndivRecipe";
+}
+
+<div class="container">
+    <br>
+    <div class="row">
+        <div class="col-lg-9">
+
+            <div class="card mt-4">
+                <img class="card-img-top img-fluid img-rounded" src="@recipe.Images[0].hostedLargeUrl" alt="">
+                <div class="card-body">
+                    <h3 class="card-title">@recipe.Name</h3>
+                    <h4>Ingredients List</h4>
+                    <p class="card-text">
+                        @foreach (string ingredient in recipe.ingredientLines)
+                        {
+                            <ul>
+                                <li> @ingredient</li>
+                            </ul>
+                        }
+                        <a href=@recipe.Source.sourceRecipeUrl target="_blank" class="btn btn-success">View cooking steps</a>
+                    </p>
+                    <span class="text-warning">&#9733; &#9733; &#9733; &#9733; &#9734;</span>
+                    4.0 stars
+                </div>
+            </div>
+            <!-- /.card -->
+
+            <div class="card card-outline-secondary my-4">
+                <div class="card-header">
+                    <h4>Recipe Reviews</h4>
+                </div>
+                <div class="card-body">
+                    @foreach (reSauceFul.Models.Review review in reviews)
+                    {  
+                        <em>@review.Comment</em>
+                        <p><small class="text-muted">Posted by @review.User.Name</small></p>
+                    }              
+                    <hr>
+                    <p class="card-text">@Html.ActionLink("Review Recipe", "LoginPage", new { recipeName = recipe.Name, apiId = recipe.Id }, new { @class = "btn btn-success" })</p>   
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col-lg-9 -->
+    </div>
+</div>
+<!-- /.container -->
+<p>
+    @Html.ActionLink("Back to Search", "Index", null, new { @class = "btn btn-success" })
+</p>
+   

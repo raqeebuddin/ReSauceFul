@@ -1,0 +1,52 @@
+﻿@model reSauceFul.Models.UserSearch
+
+@{
+    ViewBag.Title = "Index";
+}
+
+    @*@{
+        Layout = "~/Views/Shared/_LayoutPage2.cshtml";
+    }*@
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.Ingredients, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @ViewBag.noResult
+                @Html.EditorFor(model => model.Ingredients, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Ingredients, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group"> 
+            <div class="col-md-offset-2 col-md-10">
+                Cooking Time:
+            </div>
+            <div class="col-md-offset-2 col-md-10">
+                @Html.DropDownList("cookingTime", "30")
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                Dieatery Peference:
+            </div>
+            <div class="col-md-offset-2 col-md-10">
+                 @Html.DropDownList("preference", "None")
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Find Recipe" class = "btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+
+

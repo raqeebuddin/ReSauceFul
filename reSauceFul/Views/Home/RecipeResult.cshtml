@@ -1,0 +1,35 @@
+﻿@model IEnumerable<reSauceFul.Models.Recipes>
+
+@{
+    ViewBag.Title = "RecipeResult";
+}
+<div class="container">
+
+    <!-- Page Heading -->
+    <h1 class="my-4">
+        Search Results
+        <small></small>
+    </h1>
+    <div class="row">
+        @foreach (reSauceFul.Models.Recipes recipe in Model)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6 portfolio-item">
+                <div class="card h-100">
+                    <img class="card-img-top img-rounded" src="@recipe.SmallImageUrls[0]" alt="">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            @recipe.RecipeName
+                        </h4>
+                        <span class="text-warning">&#9733; &#9733; &#9733; &#9733; &#9734;</span>
+                        @recipe.Rating stars
+                        <p class="card-text">@Html.ActionLink("View Recipe", "IndivRecipe", new { recipe = recipe.Id }, new { @class = "btn btn-success" })</p>                 
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <!-- /.row -->
+</div>
+<p>
+    @Html.ActionLink("Back to Search", "Index",null,new { @class = "btn btn-success" })
+</p>
