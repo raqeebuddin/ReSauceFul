@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutoMapper;
+using Newtonsoft.Json;
 using reSauceFul.Models;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,8 @@ namespace reSauceFul.Controllers
                     if (data.Matches.Count() == 0)
                     {
                         ViewBag.noResult = "No Recipes Found please try again";
+                        ViewBag.cookingTime = new SelectList(new List<string> { "15", "30", "45" });
+                        ViewBag.preference = new SelectList(new List<string> { "vegan ", "vegetarian ", "gluten free " });
                         return View("Index");
                     }
                     else
@@ -121,29 +124,27 @@ namespace reSauceFul.Controllers
                 var dbUserQuery = from d in db.Users
                                   orderby d.Name
                                   select d.Name;
+                int intRecipeID = Convert.ToInt32(recipeID);
                 //If user exists
                 if (dbUserQuery.Contains(userDetails.Name))
                 {
-                    //get user id
-                    var matches = from user in db.Users
-                                  where user.Name.Equals(userDetails.Name)
-                                  select user.Id;
-                    var test = matches.ToList();
-                    int userId = test[0];
-                    var reviewSearch = db.Reviews.Where(b => b.UserId.Equals(userId)).FirstOrDefault();
-
-                    if (reviewSearch.UserId == test[0])
+               
+                    User user = db.Users.Where(b => b.Name.Equals(userDetails.Name)).FirstOrDefault();
+                    Review CompletedReview = db.Reviews.Where(b => b.UserId.Equals(user.Id)&& b.RecipeId == intRecipeID).FirstOrDefault();
+                 
+                    if (CompletedReview == null)
                     {
-                        return View("CreateReview", reviewSearch);
-                    }
-                    else
-                    { 
                         //create new Review obj and add user id
                         Review review = new Review();
                         review.RecipeId = Convert.ToInt32(recipeID);
-                        review.UserId = test[0];
+                        review.UserId = user.Id;
                         //pass review object to have additional information added in from View
                         return View("CreateReview", review);
+                       
+                    }
+                    else
+                    {
+                        return View("CreateReview", CompletedReview);
                     }
                 }
                 else
@@ -182,23 +183,29 @@ namespace reSauceFul.Controllers
         {
             if (ModelState.IsValid)
             {
-                var dbUserQuery = from d in db.Reviews
-                                  orderby d.UserId
-                                  select d.UserId;
-                if (dbUserQuery.Contains(CompletedReview.UserId))
+                // user exists
+                var dbUserQuery = db.Reviews.Where(b => b.UserId.Equals(CompletedReview.UserId)).FirstOrDefault();
+                Review dbReviewSearch = db.Reviews.Find(CompletedReview.Id);
+           
+
+                if (dbReviewSearch==null)
                 {
-                    db.Entry(CompletedReview).State = EntityState.Modified;
+
+                    //receive Review data  and save
+                    db.Reviews.Add(CompletedReview);
                     db.SaveChanges();
                     var search = db.Recipes.Include("Reviews").Where(b => b.Id.Equals(CompletedReview.RecipeId)).FirstOrDefault();
                     return RedirectToAction("IndivRecipe", new { recipe = search.ApiId });
                 }
                 else
                 {
-                    //receive Review data  and save
-                    db.Reviews.Add(CompletedReview);
+                    //update the review in the data base
+                    Review dbReview = db.Reviews.Find(CompletedReview.Id);
+                    dbReview.Comment = CompletedReview.Comment;
                     db.SaveChanges();
-                    var search = db.Recipes.Include("Reviews").Where(b => b.Id.Equals(CompletedReview.RecipeId)).FirstOrDefault();
+                    var search = db.Recipes.Where(b => b.Id.Equals(CompletedReview.RecipeId)).FirstOrDefault();
                     return RedirectToAction("IndivRecipe", new { recipe = search.ApiId });
+
                 }
             }
 
